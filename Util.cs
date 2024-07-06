@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-public static class Util
+public class Util
 {
-    public static IEnumerable<string> GetLines(string yourtextfile)
+    public IEnumerable<string> GetLines(string yourtextfile)
     {
         TextReader reader = new StreamReader(yourtextfile);
         string line;
@@ -16,13 +16,13 @@ public static class Util
         reader.Close();
     }
     
-    public static void CheckIfFileExists(string filePath)
+    public void CheckIfFileExists(string filePath)
     {
         if (!File.Exists(filePath))
         {
             throw new FileNotFoundException("File not found");
         }
-        if(Util.GetLines(filePath) == null)
+        if(GetLines(filePath) == null)
         {
             throw new FileLoadException("File is empty");
         }

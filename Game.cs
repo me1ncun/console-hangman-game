@@ -5,6 +5,15 @@ using System.Linq;
 
 public class Game
 {
+    private readonly Util _util;
+    private readonly DesignGallow _design;
+    
+    public Game()
+    {
+        _util = new Util();
+        _design = new DesignGallow();
+    }
+    
     public void Start()
     {
         string word = GenerateWord();
@@ -25,7 +34,6 @@ public class Game
         }
 
         Console.WriteLine($"Вы проиграли, загадано слово: {word}");
-        
     }
     
     private string CloseWord(string word)
@@ -35,29 +43,33 @@ public class Game
     
     private void Printer(List<char> mistakes, List<char> result, string word)
     {
-        DesignGallow.Print(mistakes.Count);
+        _design.Print(mistakes.Count);
         Console.WriteLine($"\nОшибки: {mistakes.Count}, Попытки: {String.Join(",", mistakes)}");
         Console.WriteLine($"Слово: {String.Concat(result)}");
-        Console.Write("Введите букву: ");
+        Console.WriteLine("Введите букву: ");
 
-        char letter = Convert.ToChar(Console.ReadLine());
-        letter = CheckValidInput(letter);
-
+        var letter = CheckLetter();
+        
         CheckIfLetterIsInWord(word, letter, result, mistakes);
     }
     
-    private char CheckValidInput(char letter)
+    private char CheckLetter()
     {
-        if (!char.IsLetter(letter))
+        var input = Console.ReadLine();
+        
+        var parsed = Char.TryParse(input, out var letter);
+        if(!parsed)
         {
-            Console.WriteLine("Некорректный ввод. Пожалуйста, введите одну букву: ");
+            Console.WriteLine("Некорректный ввод, введите букву еще раз");
+            return CheckLetter();
         }
 
-        if (Char.IsUpper(letter))
+        if (char.IsUpper(letter))
         {
-            Console.WriteLine("Пожалуйста, введите букву в нижнем регистре: ");
+            Console.WriteLine("Валидными считаются только маленькие буквы, введите букву еще раз");
+            return CheckLetter();
         }
-
+        
         return letter;
     }
     
@@ -76,12 +88,12 @@ public class Game
     {
         string filePath = "dictionary.txt";
         
-        Util.CheckIfFileExists(filePath);
+        _util.CheckIfFileExists(filePath);
         
         StreamReader streamReader = new StreamReader(filePath);
         Random random = new Random();
         
-        int randomNumber = random.Next(Util.GetLines(filePath).Count());
+        int randomNumber = random.Next(_util.GetLines(filePath).Count());
         
         string line;
         var counter = 0;
@@ -105,6 +117,12 @@ public class Game
         }
         else
         {
+            if(mistakes.Contains(letter))
+            {
+                Console.WriteLine("Вы уже вводили эту букву");
+                return;
+            }
+            
             AddMistake(mistakes, letter);
         }
     }

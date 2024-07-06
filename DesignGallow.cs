@@ -1,7 +1,7 @@
 ﻿using System;
-public static class DesignGallow
+public class DesignGallow
 {
-    public static void Print(int mistakes)
+    public void Print(int mistakes)
     {
         switch (mistakes)
         {
