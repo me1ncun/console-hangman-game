@@ -21,8 +21,6 @@ public class Game
         List<char> mistakes = new List<char>();
         List<char> result = CloseWord(word).ToCharArray().ToList();
         
-        Console.WriteLine(word + "\n" + String.Concat(result));
-        
         while (mistakes.Count <= 7)
         {
             Printer(mistakes, result, word);
