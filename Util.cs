@@ -12,6 +12,19 @@ public static class Util
         {
             yield return line;
         }
+        
         reader.Close();
+    }
+    
+    public static void CheckIfFileExists(string filePath)
+    {
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException("File not found");
+        }
+        if(Util.GetLines(filePath) == null)
+        {
+            throw new FileLoadException("File is empty");
+        }
     }
 }

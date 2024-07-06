@@ -1,9 +1,9 @@
 ﻿using System;
 public static class DesignGallow
 {
-    public static void Print(int mistake)
+    public static void Print(int mistakes)
     {
-        switch (mistake)
+        switch (mistakes)
         {
             default:
                 Console.WriteLine("     " + (char)95 + (char)95 + (char)95 + (char)95 + (char)95 + "\n" +

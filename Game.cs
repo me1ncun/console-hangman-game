@@ -5,9 +5,78 @@ using System.Linq;
 
 public class Game
 {
+    public void Start()
+    {
+        string word = GenerateWord();
+        
+        List<char> mistakes = new List<char>();
+        List<char> result = CloseWord(word).ToCharArray().ToList();
+        
+        Console.WriteLine(word + "\n" + String.Concat(result));
+        
+        while (mistakes.Count <= 7)
+        {
+            Printer(mistakes, result, word);
+            if (CheckWinner(word, result))
+            {
+                Console.WriteLine("Вы выиграли!");
+                return;
+            }
+        }
+
+        Console.WriteLine($"Вы проиграли, загадано слово: {word}");
+        
+    }
+    
+    private string CloseWord(string word)
+    {
+        return new string('*', word.Length);
+    }
+    
+    private void Printer(List<char> mistakes, List<char> result, string word)
+    {
+        DesignGallow.Print(mistakes.Count);
+        Console.WriteLine($"\nОшибки: {mistakes.Count}, Попытки: {String.Join(",", mistakes)}");
+        Console.WriteLine($"Слово: {String.Concat(result)}");
+        Console.Write("Введите букву: ");
+
+        char letter = Convert.ToChar(Console.ReadLine());
+        letter = CheckValidInput(letter);
+
+        CheckIfLetterIsInWord(word, letter, result, mistakes);
+    }
+    
+    private char CheckValidInput(char letter)
+    {
+        if (!char.IsLetter(letter))
+        {
+            Console.WriteLine("Некорректный ввод. Пожалуйста, введите одну букву: ");
+        }
+
+        if (Char.IsUpper(letter))
+        {
+            Console.WriteLine("Пожалуйста, введите букву в нижнем регистре: ");
+        }
+
+        return letter;
+    }
+    
+    private void OpenLetter(string word, char letter, List<char> result)
+    {
+        for (int i = 0; i < word.Length; i++)
+        {
+            if (word[i] == letter)
+            {
+                result[i] = letter;
+            }
+        }
+    }
+    
     private string GenerateWord()
     {
         string filePath = "dictionary.txt";
+        
+        Util.CheckIfFileExists(filePath);
         
         StreamReader streamReader = new StreamReader(filePath);
         Random random = new Random();
@@ -27,112 +96,26 @@ public class Game
         
         return null;
     }
-    
-    public void Start()
+
+    private void CheckIfLetterIsInWord(string word, char letter, List<char> result, List<char> mistakes)
     {
-        string generateWord = GenerateWord();
-        
-        List<char> mistakesList = new List<char>();
-        List<char> result = new List<char>();
-        for (int i = 0; i < generateWord.Length; i++)
+        if (word.Contains(letter))
         {
-            result[i] = '_';
+            OpenLetter(word, letter, result);
         }
-        int counter = 1;
-        while (mistakesList.Count <= 8)
+        else
         {
-            string compareResult = result.ToString();
-            if (compareResult == generateWord)
-            {
-                Console.WriteLine("\nВы выиграли!");
-                break;
-            }
-
-            Console.WriteLine("\n\nПопытка №" + counter++);
-            DesignGallow.Print(mistakesList.Count);
-            if (mistakesList.Count == 7) 
-            {
-                Console.WriteLine($"\nВи проиграли, загадано слово {generateWord}");
-                break;
-            }
-            Console.Write($"Буква: ");
-            char answer = Convert.ToChar(Console.ReadLine());
-            if (generateWord.Contains(answer))
-            {
-                CountLetters(generateWord, answer, result);
-
-                Console.Write("Слово: ");
-                foreach (char c in result)
-                {
-                    Console.Write(c);
-                }
-                Console.WriteLine();
-            }
-            else if (!generateWord.Contains(answer))
-            {
-                Console.Write("Слово: ");
-                foreach (char c in result)
-                {
-                    Console.Write(c);
-                }
-                Console.WriteLine();
-                mistakesList.Add(answer);
-            }
-
-            Console.Write($"Ошибки: ({mistakesList.Count}) ");
-            foreach (char c in mistakesList)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write(c + ", ");
-                Console.ResetColor();
-            }
-
+            AddMistake(mistakes, letter);
         }
     }
     
-    public string CloseWord(string word)
+    private void AddMistake(List<char> mistakes, char letter)
     {
-        string closeWord = "";
-        for (int i = 0; i < word.Length; i++)
-        {
-            closeWord += "_";
-        }
-        return closeWord;
+        mistakes.Add(letter);
     }
-
-    private void CountLetters(string word, char answer, List<char> result)
+    
+    private bool CheckWinner(string word, List<char> result)
     {
-        int counter = 0;
-        foreach (char c in word)
-        {
-            if(c == answer)
-            {
-                counter++;
-            }
-        }
-        if(counter == 1) 
-        {
-            int indexEntrance = word.IndexOf(answer);
-            for (int i = 0; i < result.Count; i++)
-            {
-                if (i == indexEntrance)
-                {
-                    result[i] = answer;
-                }
-            }
-        }
-        if(counter == 2)
-        {
-            int firstIndexEntrance = word.IndexOf(answer);
-            int lastIndexEntrance = word.LastIndexOf(answer);
-
-            for (int i = 0; i < result.Count; i++)
-            {
-                if (i == firstIndexEntrance || i == lastIndexEntrance)
-                {
-                    result[i] = answer;
-                }
-            }
-        }
+        return word == String.Concat(result);
     }
 }
